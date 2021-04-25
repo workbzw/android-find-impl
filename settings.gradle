@@ -1,2 +1,6 @@
+include ':module_common'
+include ':module_personal'
+include ':module_login'
 include ':app'
+include ':arouter-idea-plugin'
 rootProject.name = "AgileApplication"
