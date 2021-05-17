@@ -23,8 +23,10 @@ android {
             }
         }
     }
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
+        // for view binding :
+        // viewBinding = true
     }
     buildTypes {
         release {
@@ -117,5 +119,6 @@ dependencies {
     implementation "com.alibaba:arouter-api:$arouter_version"
     annotationProcessor "com.alibaba:arouter-compiler:$arouter_version"
 
+    implementation "com.workbzw:tools:1.0"
 
 }

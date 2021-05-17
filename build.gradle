@@ -13,11 +13,14 @@ buildscript {
 
 allprojects {
     repositories {
+        /*local maven repository*/
+        maven { url 'file:/Users/bzw/workspace/maven/android/' }
         jcenter()
         google()
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
+
+
+
+
