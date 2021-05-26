@@ -2,8 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.7">
-      <module name="AgileApplication.lib_base" target="1.8" />
       <module name="AgileApplication.lib_im" target="1.8" />
+      <module name="AgileApplication.lib_image" target="1.8" />
       <module name="AgileApplication.lib_map" target="1.8" />
       <module name="AgileApplication.lib_push" target="1.8" />
       <module name="AgileApplication.lib_share" target="1.8" />

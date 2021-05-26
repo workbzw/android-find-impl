@@ -15,6 +15,7 @@ allprojects {
     repositories {
         /*local maven repository*/
         maven { url 'file:/Users/bzw/workspace/maven/android/' }
+        mavenCentral()
         jcenter()
         google()
     }
