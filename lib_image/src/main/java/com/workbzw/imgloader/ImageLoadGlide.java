@@ -13,8 +13,7 @@ import com.bumptech.glide.request.RequestOptions;
  * @date 2021/5/23 7:57 PM
  * @desc
  */
-
-public class ImageLoaderGlide extends BaseImageLoadServiceImpl {
+public class ImageLoadGlide extends BaseImageLoadActionImpl {
 
     private RequestOptions options;
 

@@ -61,6 +61,8 @@ android {
 
 dependencies {
 
+    api project(':lib_base_frame')
+    annotationProcessor project(':lib_base_frame_process')
 
     implementation "com.workbzw:tools:1.0"
 
@@ -89,7 +91,7 @@ dependencies {
     def room_version = "2.3.0"
 
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
     implementation "androidx.room:room-rxjava3:$room_version"
     implementation "androidx.room:room-guava:$room_version"
@@ -122,6 +124,5 @@ dependencies {
     def arouter_version = "1.5.1"
 
     implementation "com.alibaba:arouter-api:$arouter_version"
-    annotationProcessor "com.alibaba:arouter-compiler:$arouter_version"
-
+    kapt "com.alibaba:arouter-compiler:$arouter_version"
 }

@@ -5,10 +5,10 @@ package com.workbzw.imgloader;
  * @CreateDate: 2021/5/23 7:48 PM
  * @Description:
  */
-public abstract class BaseImageLoadServiceImpl implements ImageLoadService {
+public abstract class BaseImageLoadActionImpl implements ImageLoadAction {
     @Override
-    public String info() {
-        return "ImageLoader";
+    public String name() {
+        return "ImageLoaderService";
     }
 
 }
