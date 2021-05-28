@@ -2,8 +2,8 @@ package com.workbzw.imgloader;
 
 import android.widget.ImageView;
 
+import com.workbzw.baseannotation.Action;
 import com.workbzw.componentframe.IAction;
-import com.workbzw.componentframe.annotation.Action;
 
 /**
  * @author bzw [workbzw@outlook.com]
