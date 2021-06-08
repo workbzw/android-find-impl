@@ -27,8 +27,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.MirroredTypeException;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -36,7 +34,6 @@ import javax.tools.Diagnostic;
 
 @AutoService(Processor.class)
 public class ServiceProcesser extends AbstractProcessor {
-    private ProcessingEnvironment env;
     private Elements elementUtils;
     private Messager messager;
     private Filer filer;
@@ -44,7 +41,6 @@ public class ServiceProcesser extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
-        this.env = env;
         elementUtils = env.getElementUtils();
         filer = env.getFiler();
         messager = env.getMessager();
@@ -78,48 +74,61 @@ public class ServiceProcesser extends AbstractProcessor {
 
         if (set.isEmpty())
             return false;
-        env.getMessager().printMessage(Diagnostic.Kind.WARNING, "-----start process-----");
+
+        messager.printMessage(Diagnostic.Kind.WARNING, "-----start process-----");
         Set<? extends Element> services = roundEnv.getElementsAnnotatedWith(Service.class);
         String packageName = null;
 
+        /*组件注解的全路径*/
         String annotationPath = "com.workbzw.baseframe.IService";
 
         TypeElement IServiceType = elementUtils.getTypeElement(annotationPath);
 
+        /*routeTable()方法传入值 -> Map<String,<Class<? extends IService>>*/
         TypeMirror IServiceTypeMirror = IServiceType.asType();
-        ParameterizedTypeName mapTypeName = ParameterizedTypeName.get(ClassName.get(Map.class)
+        ParameterizedTypeName mapType = ParameterizedTypeName.get(ClassName.get(Map.class)
                 , ClassName.get(String.class)
                 , ParameterizedTypeName.get(
                         ClassName.get(Class.class)
                         , WildcardTypeName.subtypeOf(ClassName.get(IServiceType))));
-
-        ParameterSpec spec = ParameterSpec.builder(mapTypeName, "table").build();
+        /*构建方法名为routeTable 的方法*/
+        ParameterSpec spec = ParameterSpec.builder(mapType, "table").build();
         MethodSpec.Builder builder = MethodSpec.methodBuilder("routeTable")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(Map.class)
                 .addParameter(spec);
 
+        /*生成的类名*/
         String createdClassName = "Router$$Table";
 
         for (Element element : services) {
+            /*包名*/
             packageName = elementUtils.getPackageOf(element).getQualifiedName().toString();
             messager.printMessage(Diagnostic.Kind.WARNING, "packageName:" + packageName);
 
-            String className = element.getSimpleName().toString();
-            messager.printMessage(Diagnostic.Kind.WARNING, "className:" + className);
+            /*当前被注解的class的类名*/
+            String serviceImplClassName = element.getSimpleName().toString();
+            messager.printMessage(Diagnostic.Kind.WARNING, "className:" + serviceImplClassName);
 
+            /*获取该class的所实现的所有接口*/
             List<? extends TypeMirror> interfaces = ((TypeElement) element).getInterfaces();
             for (int i = 0; i < interfaces.size(); i++) {
-                TypeMirror typeMirror = interfaces.get(i);
-                boolean isIServiceAbstract = typeUtils.isSubtype(typeMirror, IServiceTypeMirror);
+                /*遍历接口 找到继承IService的XXXService服务*/
+                TypeMirror service = interfaces.get(i);
+
+                boolean isIServiceAbstract = typeUtils.isSubtype(service, IServiceTypeMirror);
+                /*如果该接口继承自IService*/
                 if (isIServiceAbstract) {
+                    /*获取抽象接口*/
+                    TypeName servicePath = ClassName.get(service);
 
-                    TypeName typeName = ClassName.get(typeMirror);
+                    /*获取实现类*/
+                    String mapValue = packageName + "." + serviceImplClassName;
+                    TypeElement serviceElement = elementUtils.getTypeElement(mapValue);
+                    ClassName serviceImplPath = ClassName.get(serviceElement);
 
-                    String mapValue = packageName + "." + className;
-                    TypeElement typeElement = elementUtils.getTypeElement(mapValue);
-                    ClassName impl = ClassName.get(typeElement);
-                    builder.addStatement("table.put($S,$T.class)", typeName, impl);
+                    /*在 Router$$Table 类的 routeTable() 方法中 增加一句 table.put("com.xxx.XXXService",XXXServiceImpl.class)*/
+                    builder.addStatement("table.put($S,$T.class)", servicePath, serviceImplPath);
                 }
             }
         }
@@ -138,14 +147,5 @@ public class ServiceProcesser extends AbstractProcessor {
             e.printStackTrace();
         }
         return false;
-    }
-
-    private static TypeMirror getActor(Service annotation) {
-        try {
-//            annotation.name(); // this should throw
-        } catch (MirroredTypeException mte) {
-            return mte.getTypeMirror();
-        }
-        return null; // can this ever happen ??
     }
 }
