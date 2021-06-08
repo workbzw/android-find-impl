@@ -7,7 +7,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_7
 }
 dependencies {
-    api project(':lib_base_frame_annotation')
+    api project(':lib_base_frame')
 
     implementation 'com.google.auto.service:auto-service:1.0-rc6'
     annotationProcessor 'com.google.auto.service:auto-service:1.0-rc6'

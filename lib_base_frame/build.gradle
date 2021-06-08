@@ -8,6 +8,4 @@ java {
 }
 
 dependencies {
-    api project(':lib_base_frame_process')
-    annotationProcessor project(':lib_base_frame_process')
 }

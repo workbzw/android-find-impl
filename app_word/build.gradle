@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.library'
+    id 'com.android.application'
 }
 
 android {
@@ -29,5 +29,4 @@ android {
 
 dependencies {
     api project(':lib_base_frame')
-    annotationProcessor project(':lib_base_frame_process')
 }
