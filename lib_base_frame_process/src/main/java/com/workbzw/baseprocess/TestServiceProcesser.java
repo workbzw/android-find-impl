@@ -123,7 +123,7 @@ public class TestServiceProcesser extends AbstractProcessor {
                 e.printStackTrace();
             }
         }
-        return true;
+        return false;
     }
 
     private static TypeMirror getActor(Service annotation) {

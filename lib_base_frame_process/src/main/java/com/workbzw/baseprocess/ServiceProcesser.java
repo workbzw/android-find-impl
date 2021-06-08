@@ -86,14 +86,12 @@ public class ServiceProcesser extends AbstractProcessor {
 
         TypeElement IServiceType = elementUtils.getTypeElement(annotationPath);
 
-
         TypeMirror IServiceTypeMirror = IServiceType.asType();
         ParameterizedTypeName mapTypeName = ParameterizedTypeName.get(ClassName.get(Map.class)
                 , ClassName.get(String.class)
                 , ParameterizedTypeName.get(
                         ClassName.get(Class.class)
                         , WildcardTypeName.subtypeOf(ClassName.get(IServiceType))));
-
 
         ParameterSpec spec = ParameterSpec.builder(mapTypeName, "table").build();
         MethodSpec.Builder builder = MethodSpec.methodBuilder("routeTable")
@@ -116,11 +114,8 @@ public class ServiceProcesser extends AbstractProcessor {
                 boolean isIServiceAbstract = typeUtils.isSubtype(typeMirror, IServiceTypeMirror);
                 if (isIServiceAbstract) {
 
-
                     TypeName typeName = ClassName.get(typeMirror);
 
-                    ClassName IServiceClassName = ClassName.get(IServiceType);
-                    String mapKey = packageName + "." + IServiceClassName;
                     String mapValue = packageName + "." + className;
                     TypeElement typeElement = elementUtils.getTypeElement(mapValue);
                     ClassName impl = ClassName.get(typeElement);
@@ -142,7 +137,7 @@ public class ServiceProcesser extends AbstractProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return true;
+        return false;
     }
 
     private static TypeMirror getActor(Service annotation) {
