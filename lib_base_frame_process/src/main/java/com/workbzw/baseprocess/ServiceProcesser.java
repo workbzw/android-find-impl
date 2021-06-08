@@ -115,7 +115,7 @@ public class ServiceProcesser extends AbstractProcessor {
             for (int i = 0; i < interfaces.size(); i++) {
                 /*遍历接口 找到继承IService的XXXService服务*/
                 TypeMirror service = interfaces.get(i);
-
+                /*限定必须有接口XXXService继承于IService 实现类实现XXXService 否则路由表不予识别*/
                 boolean isIServiceAbstract = typeUtils.isSubtype(service, IServiceTypeMirror);
                 /*如果该接口继承自IService*/
                 if (isIServiceAbstract) {
