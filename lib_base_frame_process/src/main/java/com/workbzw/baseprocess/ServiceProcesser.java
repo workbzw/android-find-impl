@@ -91,6 +91,7 @@ public class ServiceProcesser extends AbstractProcessor {
                 , ParameterizedTypeName.get(
                         ClassName.get(Class.class)
                         , WildcardTypeName.subtypeOf(ClassName.get(IServiceType))));
+
         /*构建方法名为routeTable 的方法*/
         ParameterSpec spec = ParameterSpec.builder(mapType, "table").build();
         MethodSpec.Builder builder = MethodSpec.methodBuilder("routeTable")
@@ -132,9 +133,11 @@ public class ServiceProcesser extends AbstractProcessor {
                 }
             }
         }
+        /*构建方法返回值*/
         MethodSpec methodSpec = builder
                 .addStatement("return table")
                 .build();
+        /*构建带有routerTable() 的类*/
         TypeSpec clazz = TypeSpec.classBuilder(createdClassName)
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(methodSpec)
