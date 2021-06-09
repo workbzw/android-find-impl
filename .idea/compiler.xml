@@ -23,6 +23,7 @@
     <bytecodeTargetLevel target="1.7">
       <module name="AgileApplication.app_word" target="1.8" />
       <module name="AgileApplication.app_word_pic" target="1.8" />
+      <module name="AgileApplication.buildSrc" target="1.8" />
       <module name="AgileApplication.component_base" target="1.8" />
       <module name="AgileApplication.component_personal" target="1.8" />
       <module name="AgileApplication.lib_im" target="1.8" />

@@ -1,7 +1,8 @@
 plugins {
     id 'com.android.library'
 }
-
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -29,8 +30,8 @@ android {
 
 dependencies {
     api project(':lib_base_frame')
-    annotationProcessor project(':lib_base_frame_process')
+    kapt project(':lib_base_frame_process')
 
     implementation 'com.github.bumptech.glide:glide:4.12.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+    kapt 'com.github.bumptech.glide:compiler:4.12.0'
 }

@@ -1,0 +1,16 @@
+package com.workbzw.plugin
+
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+class RoutingTable implements Plugin<Project> {
+
+    @Override
+    void apply(Project target) {
+        project.task("cusplugin"){
+            doLast{
+                println("cusplugin任务执行111")
+            }
+        }
+    }
+}

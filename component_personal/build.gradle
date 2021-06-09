@@ -6,6 +6,7 @@ if (Boolean.valueOf(componentization)) {
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -36,6 +37,8 @@ android {
 
 dependencies {
     api project(':component_base')
+    kapt "com.android.databinding:compiler:3.5.0"
+
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
