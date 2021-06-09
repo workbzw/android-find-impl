@@ -1,0 +1,27 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+
+dependencies {
+    //gradle sdk
+    implementation gradleApi()
+    //groovy sdk
+    implementation localGroovy()
+}
+//以上配置比较固定
+//以下内容主要用来上传插件
+repositories {
+    mavenCentral()
+}
+
+group = 'com.workbzw.plugin'
+version = '1.0.0'
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('/Users/bzw/workspace/maven/android/'))
+        }
+    }
+}

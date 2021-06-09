@@ -1,0 +1,22 @@
+package com.workbzw.plugin
+
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+//插件是一个类 继承Plugin
+class RoutingTable implements Plugin<Project> {
+
+//重载 void apply(Project project)方法，这个方法将会传入使用这个插件的 project 的实例，这是一个重要的 context。
+    @Override
+    void apply(Project project) {
+        /*project.task('lintOutputsTask') {
+            doLast {
+                println("lint outputs task start...")
+            }
+        }*/
+        project.afterEvaluate {
+            project.android.lintOptions.xmlOutput = new File(project.buildDir, "lintResult.xml")
+        }
+        project.tasks.create('cleanTest', CleanTestTask)
+    }
+}

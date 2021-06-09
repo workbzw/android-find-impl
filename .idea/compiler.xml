@@ -33,6 +33,7 @@
       <module name="AgileApplication.lib_share" target="1.8" />
       <module name="AgileApplication.lib_tools" target="1.8" />
       <module name="AgileApplication.lib_widget" target="1.8" />
+      <module name="AgileApplication.plugin-router" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
