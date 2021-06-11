@@ -1,27 +1,43 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
-
 dependencies {
     //gradle sdk
     implementation gradleApi()
     //groovy sdk
     implementation localGroovy()
+
 }
 //以上配置比较固定
 //以下内容主要用来上传插件
 repositories {
+    mavenLocal()
     mavenCentral()
+    jcenter()
 }
 
-group = 'com.workbzw.plugin'
-version = '1.0.0'
-
-
 uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: uri('/Users/bzw/workspace/maven/android/'))
+    repositories.mavenDeployer {
+        // 本地仓库路径
+        repository(url: uri("$rootDir/maven-repo"))
+        pom.groupId = "com.workbzw.plugin.router"
+        pom.artifactId = "RoutingTable"
+        pom.version = "1.0.0"
+    }
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDir 'src/main/groovy'
+        }
+        resources {
+            srcDir 'src/main/resources'
         }
     }
 }
+
+dependencies {
+    implementation 'com.android.tools.build:gradle:4.1.3'
+}
+
