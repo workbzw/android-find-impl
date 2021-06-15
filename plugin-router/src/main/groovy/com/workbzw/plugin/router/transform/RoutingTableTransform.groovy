@@ -1,11 +1,18 @@
 package com.workbzw.plugin.router.transform
+import com.workbzw.plugin.router.utils.CodeGenerator
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
+import com.workbzw.plugin.router.utils.ScanSetting
 import com.workbzw.plugin.router.utils.ScanUtils
+import org.gradle.api.Project
 
 class RoutingTableTransform extends Transform {
+
+    Project project
+    static ArrayList<ScanSetting> registerList
+    static File fileContainsInitClass;
 
     @Override
     String getName() {
@@ -65,15 +72,14 @@ class RoutingTableTransform extends Transform {
             for (JarInput jarInput : input.getJarInputs()) {
                 File src = jarInput.getFile()
 
-                if (ScanUtils.shouldProcessPreDexJar(src.absolutePath)){
-                    ScanUtils.scanJar(src)
-                }
-
                 File dest = outputProvider.getContentLocation(
                         jarInput.getName(),
                         jarInput.getContentTypes(),
                         jarInput.getScopes(),
                         Format.JAR);
+                if (ScanUtils.shouldProcessPreDexJar(src.absolutePath)) {
+                    ScanUtils.scanJar(src, dest)
+                }
                 //将修改过的字节码copy到dest，就可以实现编译期间干预字节码的目的了
                 FileUtils.copyFile(jarInput.getFile(), dest);
             }
@@ -82,10 +88,6 @@ class RoutingTableTransform extends Transform {
             for (DirectoryInput directoryInput : input.getDirectoryInputs()) {
                 /*文件相关操作*/
                 /************************************/
-//                File file = directoryInput.getFile()
-//                file.each { f ->
-//                    println("++++++++" + f + "++++++++")
-//                }
 
                 /***********************************/
 
@@ -96,6 +98,21 @@ class RoutingTableTransform extends Transform {
                         Format.DIRECTORY)
                 //将修改过的字节码copy到dest，就可以实现编译期间干预字节码的目的了
                 FileUtils.copyDirectory(directoryInput.getFile(), dest)
+            }
+        }
+
+        if (fileContainsInitClass) {
+            registerList.each { ext ->
+                println('Insert register code to file ' + fileContainsInitClass.absolutePath)
+
+                if (ext.classList.isEmpty()) {
+                    println("No class implements found for interface:" + ext.interfaceName)
+                } else {
+                    ext.classList.each {
+                        println(it)
+                    }
+                    CodeGenerator.insertInitCodeTo(ext)
+                }
             }
         }
     }

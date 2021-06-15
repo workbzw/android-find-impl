@@ -8,4 +8,5 @@ import com.workbzw.lib.base.IService;
  * @desc
  */
 public interface ImageLoadService extends IService {
+    void loadImage();
 }

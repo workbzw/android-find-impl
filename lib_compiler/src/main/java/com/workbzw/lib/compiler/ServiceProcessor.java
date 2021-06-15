@@ -80,36 +80,39 @@ public class ServiceProcessor extends AbstractProcessor {
         String packageName = "";
 
         /*组件注解的全路径*/
-        String annotationPath = "com.workbzw.lib.base.IService";
+        String iServicePath = "com.workbzw.lib.base.IService";
+        String iRoutingTablePath = "com.workbzw.lib.base.IRoutingTable";
 
-        TypeElement IServiceType = elementUtils.getTypeElement(annotationPath);
+        TypeElement iServiceType = elementUtils.getTypeElement(iServicePath);
+        TypeElement iRoutingTableType = elementUtils.getTypeElement(iRoutingTablePath);
 
         /*routeTable()方法传入值 -> Map<String,<Class<? extends IService>>*/
-        TypeMirror IServiceTypeMirror = IServiceType.asType();
+        TypeMirror IServiceTypeMirror = iServiceType.asType();
         ParameterizedTypeName mapType = ParameterizedTypeName.get(ClassName.get(Map.class)
                 , ClassName.get(String.class)
                 , ParameterizedTypeName.get(
                         ClassName.get(Class.class)
-                        , WildcardTypeName.subtypeOf(ClassName.get(IServiceType))));
+                        , WildcardTypeName.subtypeOf(ClassName.get(iServiceType))));
 
         /*构建方法名为routeTable 的方法*/
         ParameterSpec spec = ParameterSpec.builder(mapType, "table").build();
-        MethodSpec.Builder builder = MethodSpec.methodBuilder("routeTable")
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("insertInto")
+                .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(Map.class)
                 .addParameter(spec);
 
         /*生成的类名*/
         String createdClassName = "";
         String packageNameGenerate = "com.workbzw.android.router.service";
+        /*包名*/
+        packageName = elementUtils.getPackageOf((Element) services.toArray()[0]).getQualifiedName().toString();
+        int index = packageName.lastIndexOf(".");
+        String lastName = packageName.substring(index + 1, packageName.length());
+        createdClassName = "Router$$Table$$" + lastName;
+
         for (Element element : services) {
-            /*包名*/
-            packageName = elementUtils.getPackageOf(element).getQualifiedName().toString();
             /*生成统一的包结构 plugin解析时统一处理*/
             messager.printMessage(Diagnostic.Kind.WARNING, "packageName:" + packageName);
-            int index = packageName.lastIndexOf(".");
-            String lastName = packageName.substring(index + 1, packageName.length());
-            createdClassName = "Router$$Table$$" + lastName;
 
             /*当前被注解的class的类名*/
             String serviceImplClassName = element.getSimpleName().toString();
@@ -125,25 +128,24 @@ public class ServiceProcessor extends AbstractProcessor {
                 /*如果该接口继承自IService*/
                 if (isIServiceAbstract) {
                     /*获取抽象接口*/
-                    TypeName servicePath = ClassName.get(service);
-
+                    TypeName serviceInterface = ClassName.get(service);
                     /*获取实现类*/
                     String mapValue = packageName + "." + serviceImplClassName;
                     TypeElement serviceElement = elementUtils.getTypeElement(mapValue);
-                    ClassName serviceImplPath = ClassName.get(serviceElement);
-
+                    ClassName serviceImpl = ClassName.get(serviceElement);
                     /*在 Router$$Table 类的 routeTable() 方法中 增加一句 table.put("com.xxx.XXXService",XXXServiceImpl.class)*/
-                    builder.addStatement("table.put($S,$T.class)", servicePath, serviceImplPath);
+                    builder.addStatement("table.put($S,$T.class)", serviceInterface, serviceImpl);
                 }
             }
         }
         /*构建方法返回值*/
         MethodSpec methodSpec = builder
-                .addStatement("return table")
+                .addStatement("return")
                 .build();
         /*构建带有routerTable() 的类*/
         TypeSpec clazz = TypeSpec.classBuilder(createdClassName)
                 .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(ClassName.get(iRoutingTableType))
                 .addMethod(methodSpec)
                 .build();
         JavaFile javaFile = JavaFile.builder(packageNameGenerate, clazz).build();

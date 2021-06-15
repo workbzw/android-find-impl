@@ -1,5 +1,7 @@
 package com.workbzw.service.image;
 
+import android.util.Log;
+
 import com.workbzw.lib.base.annotation.Service;
 
 /**
@@ -9,4 +11,10 @@ import com.workbzw.lib.base.annotation.Service;
  */
 @Service
 public class ImageLoaderGlide implements ImageLoadService {
+    private static final String TAG = "ImageLoaderGlide";
+
+    @Override
+    public void loadImage() {
+        Log.i(TAG, "loadImage: " + "我是ImageLoadService的Glide实现类的loadImage()方法！！");
+    }
 }
