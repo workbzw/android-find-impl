@@ -4,6 +4,7 @@ package com.workbzw.lib.base;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author bzw [workbzw@outlook.com]
@@ -86,9 +87,17 @@ public class ServiceManager {
     }
 
     /**
-     * init registry() {@link registry()}
+     * init registry()
      * gradle plugin will insert the bytecode: register(String routingTableClassName)
      */
     public static void routingTable() {
+    }
+
+
+    public static void printRoutingTable() {
+        Set<Map.Entry<String, Class<? extends IService>>> entrySet = ServiceManager.getRoutingTable().entrySet();
+        for (Map.Entry<String, Class<? extends IService>> entry : entrySet) {
+            System.out.println("\nK:" + entry.getKey() + "\nV:" + entry.getValue());
+        }
     }
 }
