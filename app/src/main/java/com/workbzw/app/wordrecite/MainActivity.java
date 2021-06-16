@@ -16,9 +16,9 @@ import com.workbzw.service.image.ImageLoadService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "ImageLoader";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,30 +36,21 @@ public class MainActivity extends AppCompatActivity {
 
         ServiceManager.routingTable();
         Map<String, Class<? extends IService>> map = ServiceManager.getMap();
-        Set<String> keySet = map.keySet();
-
-        for (String s : keySet) {
-            Log.i(TAG, "onCreate: " + s);
-            Class<? extends IService> instance = map.get(s);
-            try {
-//                Class<?> service = Class.forName("com.workbzw.service.image.ImageLoadService.class");
-//                Object o = service.getConstructor().newInstance();
-                if (s.equals("com.workbzw.service.image.ImageLoadService")) {
-//                if (instance instanceof o) {
-                    ImageLoadService iService = (ImageLoadService) instance.getConstructor().newInstance();
-                    iService.loadImage();
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
+        try {
+            Class<ImageLoadService> service = getService(map, ImageLoadService.class);
+            ImageLoadService iService = service.getConstructor().newInstance();
+            Log.i(TAG, "onCreate: " + iService.getClass().getName());
+            Log.i(TAG, "------------------");
+            iService.loadImage();
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
         }
     }
 
-    private static final String TAG = "MainActivity";
+    private <T extends Class> T getService(Map<String, Class<? extends IService>> map, T t) {
+        String name = t.getCanonicalName();
+        Log.i(TAG, "getService: "+name);
+        Class<? extends IService> service = map.get(name);
+        return (T) service;
+    }
 }

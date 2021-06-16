@@ -17,6 +17,29 @@ class RoutingTablePlugin implements Plugin<Project> {
         ArrayList<ScanSetting> list = new ArrayList<>(1)
         list.add(new ScanSetting('IRouteTable'))
         RoutingTableTransform.registerList = list
-        android.registerTransform(new RoutingTableTransform())
+        RoutingTableTransform rtt = new RoutingTableTransform()
+        android.registerTransform(rtt)
+        createNote(rtt, project)
+    }
+
+    private void createNote(RoutingTableTransform rtt, Project project) {
+        if (rtt.fileContainsInitClass) {
+            File rtTxt = new File(project.getRootDir() + '/RoutingTable.txt')
+            if (!rtTxt.exists()) {
+                rtTxt.createNewFile()
+            } else {
+                rtTxt.delete()
+            }
+            FileWriter fileWriter = new FileWriter(rtTxt)
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
+            registerList.each { ext ->
+                ext.classList.each { s ->
+                    bufferedWriter.write(s)
+                    bufferedWriter.newLine()
+                }
+            }
+            bufferedWriter.close()
+            fileWriter.close()
+        }
     }
 }

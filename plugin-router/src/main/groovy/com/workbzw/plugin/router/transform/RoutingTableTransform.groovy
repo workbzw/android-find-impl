@@ -1,9 +1,9 @@
 package com.workbzw.plugin.router.transform
-import com.workbzw.plugin.router.utils.CodeGenerator
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
+import com.workbzw.plugin.router.utils.CodeGenerator
 import com.workbzw.plugin.router.utils.ScanSetting
 import com.workbzw.plugin.router.utils.ScanUtils
 import org.gradle.api.Project
@@ -66,7 +66,6 @@ class RoutingTableTransform extends Transform {
         def inputs = transformInvocation.getInputs()
         //获取到输出目录，最后将修改的文件复制到输出目录，这一步必须做不然编译会报错
         def outputProvider = transformInvocation.getOutputProvider()
-
         for (TransformInput input : inputs) {
             //处理Jar中的class文件
             for (JarInput jarInput : input.getJarInputs()) {
@@ -102,9 +101,9 @@ class RoutingTableTransform extends Transform {
         }
 
         if (fileContainsInitClass) {
+            println('------registerList.size:' + registerList.size())
             registerList.each { ext ->
                 println('Insert register code to file ' + fileContainsInitClass.absolutePath)
-
                 if (ext.classList.isEmpty()) {
                     println("No class implements found for interface:" + ext.interfaceName)
                 } else {
@@ -115,6 +114,7 @@ class RoutingTableTransform extends Transform {
                 }
             }
         }
+
     }
 }
 

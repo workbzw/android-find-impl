@@ -50,9 +50,7 @@ class CodeGenerator {
                 InputStream inputStream = file.getInputStream(jarEntry)
                 jarOutputStream.putNextEntry(zipEntry)
                 if (ScanSetting.GENERATE_TO_CLASS_FILE_NAME == entryName) {
-
                     println('Insert init code to class >> ' + entryName)
-
                     def bytes = referHackWhenInit(inputStream)
                     jarOutputStream.write(bytes)
                 } else {

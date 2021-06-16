@@ -1,7 +1,10 @@
 package com.workbzw.plugin.router.utils
 
 import com.workbzw.plugin.router.transform.RoutingTableTransform
-import org.objectweb.asm.*
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -23,22 +26,12 @@ class ScanUtils {
                     ClassReader classReader = new ClassReader(inputStream)
                     //对class文件的写入
                     ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-                    //访问class文件相应的内容，解析到某一个结构就会通知到ClassVisitor的相应方法
-//                    ClassVisitor classVisitor = new RoutingTableClassVisitor(classWriter)
-                    //依次调用 ClassVisitor接口的各个方法
-//                    classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES)
                     //toByteArray方法会将最终修改的字节码以 byte 数组形式返回。
                     byte[] bytes = classWriter.toByteArray()
-
-                    //通过文件流写入方式覆盖掉原先的内容，实现class文件的改写。
-//                FileOutputStream outputStream = new FileOutputStream( file.parentFile.absolutePath + File.separator + fileName)
                     //这个地址在javac目录下
                     FileOutputStream outputStream = new FileOutputStream(jar.path)
-//                    new JarOutputStream()
                     outputStream.write(bytes)
                     outputStream.close()
-
-
                 }
             }
         }
@@ -65,18 +58,15 @@ class ScanUtils {
                 JarEntry jarEntry = (JarEntry) enumeration.nextElement()
                 String entryName = jarEntry.getName()
                 if (entryName.startsWith(ScanSetting.ROUTER_TABLE_CLASS_PRE)) {
-                    println("=========" + entryName + "=========")
-
-                }
-                if (entryName.startsWith(ScanSetting.ROUTER_CLASS_PACKAGE_NAME)) {
+                    println("=========entryName.startsWith:" + entryName + "=========")
                     InputStream inputStream = file.getInputStream(jarEntry)
                     scanClass(inputStream)
                     inputStream.close()
                 } else if (ScanSetting.GENERATE_TO_CLASS_FILE_NAME == entryName) {
+                    println("=========entryName.ServiceManager:" + entryName + "=========")
                     // mark this jar file contains LogisticsCenter.class
                     // After the scan is complete, we will generate register code into this file
                     RoutingTableTransform.fileContainsInitClass = destFile
-                    println("+++++++++" + entryName + "+++++++++")
                 }
             }
             file.close()
@@ -118,55 +108,14 @@ class ScanUtils {
             super.visit(version, access, name, signature, superName, interfaces)
             interfaces.each {
                 interfaceName ->
-                    println("########-" + interfaceName + "-########")
                     /*如果这个是RoutingTable 则执行*/
-                    if (interfaceName == ScanSetting.ROUTING_TABLE && !ScanSetting.classList.contains(interfaceName)) {
-                        println("########" + interfaceName + "########")
-                        println("########" + name + "########")
+                    if (interfaceName == ScanSetting.ROUTING_TABLE && !ScanSetting.classList.contains(name)) {
+                        println("======" + interfaceName + "======")
+                        println("======" + name + "======")
                         ScanSetting.classList.add(name)
-
+                        println("======" + ScanSetting.classList.size() + "======")
                     }
             }
-        }
-
-        @Override
-        MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-
-            MethodVisitor method = super.visitMethod(access, name, descriptor, signature, exceptions)
-            println("-------===name:"+name+"===-------")
-            if (name == ScanSetting.GENERATE_TO_METHOD_NAME) {
-//                method = new ScanMethodVisitor(Opcodes.ASM5, method)
-            }
-            return method
-        }
-    }
-
-    static class ScanMethodVisitor extends MethodVisitor {
-        String calssName;
-
-        ScanMethodVisitor(int api, MethodVisitor methodVisitor, String calssName) {
-            super(api, methodVisitor)
-            this.calssName = calssName
-        }
-
-        @Override
-        void visitInsn(int opcode) {
-            println("-------opcode:"+opcode+"-------")
-            if ((opcode >= Opcodes.IRETURN) && opcode <= Opcodes.RETURN) {
-                String name = calssName.replaceAll('/', '.')
-                mv.visitLdcInsn(name)
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC
-                        , ScanSetting.GENERATE_TO_CLASS_NAME
-                        , ScanSetting.REGISTER_METHOD_NAME
-                        , "(Ljava/lang/String;)V"
-                        , false)
-            }
-            super.visitInsn(opcode)
-        }
-
-        @Override
-        void visitMaxs(int maxStack, int maxLocals) {
-            super.visitMaxs(maxStack + 4, maxLocals)
         }
     }
 }
