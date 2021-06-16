@@ -19,7 +19,7 @@ class RoutingTablePlugin implements Plugin<Project> {
         RoutingTableTransform.registerList = list
         RoutingTableTransform rtt = new RoutingTableTransform()
         android.registerTransform(rtt)
-        createNote(rtt, project)
+//        createNote(rtt, project)
     }
 
     private void createNote(RoutingTableTransform rtt, Project project) {
@@ -28,11 +28,11 @@ class RoutingTablePlugin implements Plugin<Project> {
             if (!rtTxt.exists()) {
                 rtTxt.createNewFile()
             } else {
-                rtTxt.delete()
+//                rtTxt.delete()
             }
             FileWriter fileWriter = new FileWriter(rtTxt)
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
-            registerList.each { ext ->
+            rtt.registerList.each { ext ->
                 ext.classList.each { s ->
                     bufferedWriter.write(s)
                     bufferedWriter.newLine()

@@ -114,7 +114,6 @@ class RoutingTableTransform extends Transform {
                 }
             }
         }
-
     }
 }
 

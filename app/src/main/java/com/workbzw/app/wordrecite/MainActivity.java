@@ -13,9 +13,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.workbzw.lib.base.IService;
 import com.workbzw.lib.base.ServiceManager;
 import com.workbzw.service.image.ImageLoadService;
+import com.workbzw.service.network.NetworkService;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "ImageLoader";
@@ -34,23 +35,20 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        ServiceManager.routingTable();
-        Map<String, Class<? extends IService>> map = ServiceManager.getMap();
-        try {
-            Class<ImageLoadService> service = getService(map, ImageLoadService.class);
-            ImageLoadService iService = service.getConstructor().newInstance();
-            Log.i(TAG, "onCreate: " + iService.getClass().getName());
-            Log.i(TAG, "------------------");
-            iService.loadImage();
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+        ImageLoadService service = ServiceManager.getService(ImageLoadService.class);
+        NetworkService networkService = ServiceManager.getService(NetworkService.class);
+        Log.i(TAG, "onCreate: " + service.getClass().getName());
+        Log.i(TAG, "------------------");
+        service.loadImage();
+        networkService.request();
+        printRoutingTable();
+    }
+
+    private void printRoutingTable() {
+        Set<Map.Entry<String, Class<? extends IService>>> entrySet = ServiceManager.getRoutingTable().entrySet();
+        for (Map.Entry<String, Class<? extends IService>> entry : entrySet) {
+            Log.i(TAG, "Entry:" + "\nK:" + entry.getKey() + "\nV:" + entry.getValue());
         }
     }
 
-    private <T extends Class> T getService(Map<String, Class<? extends IService>> map, T t) {
-        String name = t.getCanonicalName();
-        Log.i(TAG, "getService: "+name);
-        Class<? extends IService> service = map.get(name);
-        return (T) service;
-    }
 }

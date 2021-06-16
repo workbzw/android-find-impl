@@ -4,7 +4,6 @@ package com.workbzw.lib.base;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author bzw [workbzw@outlook.com]
@@ -12,24 +11,67 @@ import java.util.Set;
  * @desc
  */
 public class ServiceManager {
-    private static final String TAG = "ServiceManager";
-    private static Map<String, Class<? extends IService>> registry = new HashMap<>();
+    /**
+     * all of the service which remarked with @Service
+     *
+     * @see com.workbzw.lib.base.annotation.Service
+     */
+    private static Map<String, Class<? extends IService>> registry;
+    /**
+     * after get impl by reflect , put into implCache , get impl with cache at next time
+     */
+    private static Map<String, IService> implCache;
 
-    public static Class<? extends IService> get(String name) {
+    static {
+        registry = new HashMap<>();
+        routingTable();
+    }
+
+    public static <T extends IService> T getService(Class<T> tClass) {
+        String serviceName = tClass.getCanonicalName();
+        T byCache = getByCache(serviceName);
+        if (byCache != null) {
+            return byCache;
+        } else {
+            T byReflect = getByReflect(serviceName);
+            if (implCache == null)
+                implCache = new HashMap<>();
+            implCache.put(serviceName, byReflect);
+            return byReflect;
+        }
+    }
+
+    private static <T extends IService> T getByCache(String serviceName) {
+        if (implCache == null || implCache.size() == 0) return null;
+        IService iService = implCache.get(serviceName);
+        return ((T) iService);
+    }
+
+    private static <T extends IService> T getByReflect(String serviceName) {
+        Class<? extends IService> implClass = ServiceManager.getServiceImpl(serviceName);
+        try {
+            IService iService = implClass.getConstructor().newInstance();
+            return (T) iService;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static Class<? extends IService> getServiceImpl(String name) {
         Class<? extends IService> service = registry.get(name);
         if (service == null)
-            throw new IllegalArgumentException("con't find service with this name");
+            throw new IllegalArgumentException("can't find service with this name");
         return service;
     }
 
-    public synchronized static void register(String className) {
+    public synchronized static void register(String routingTableClassName) {
         try {
-            Class<?> aClass = Class.forName(className);
-            Object instance = aClass.getConstructor().newInstance();
+            Class<?> subRoutingTableClass = Class.forName(routingTableClassName);
+            Object instance = subRoutingTableClass.getConstructor().newInstance();
             if (instance instanceof IRoutingTable) {
                 registerRoutingTable((IRoutingTable) instance);
             }
-
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -39,19 +81,14 @@ public class ServiceManager {
         table.insertInto(registry);
     }
 
-    public static void printRegistry() {
-        Set<String> keySet = registry.keySet();
-        for (String key : keySet) {
-            Class<? extends IService> service = registry.get(key);
-
-        }
-    }
-
-    public static Map<String, Class<? extends IService>> getMap() {
+    public static Map<String, Class<? extends IService>> getRoutingTable() {
         return registry;
     }
 
+    /**
+     * init registry() {@link registry()}
+     * gradle plugin will insert the bytecode: register(String routingTableClassName)
+     */
     public static void routingTable() {
-
     }
 }
