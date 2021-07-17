@@ -31,4 +31,6 @@ android {
 
 dependencies {
     api project(':component_base')
+    implementation 'androidx.navigation:navigation-fragment:2.3.5'
+    implementation 'androidx.navigation:navigation-ui:2.3.5'
 }

@@ -77,7 +77,6 @@ public class ServiceProcessor extends AbstractProcessor {
 
         messager.printMessage(Diagnostic.Kind.WARNING, "-----start process-----");
         Set<? extends Element> services = roundEnv.getElementsAnnotatedWith(Service.class);
-        String packageName = "";
 
         /*组件注解的全路径*/
         String iServicePath = "com.workbzw.lib.base.IService";
@@ -101,15 +100,14 @@ public class ServiceProcessor extends AbstractProcessor {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(spec);
 
-        /*生成的类名*/
-        String createdClassName = "";
         String packageNameGenerate = "com.workbzw.android.router.service";
         /*包名*/
-        packageName = elementUtils.getPackageOf((Element) services.toArray()[0]).getQualifiedName().toString();
+        String packageName = elementUtils.getPackageOf((Element) services.toArray()[0]).getQualifiedName().toString();
         int index = packageName.lastIndexOf(".");
         String lastName = packageName.substring(index + 1, packageName.length());
-        createdClassName = "Router$$Table$$" + lastName;
-
+        /*生成的类名*/
+        String createdClassName = "Router$$Table$$" + lastName;
+        /*循环创建方法体*/
         for (Element element : services) {
             /*生成统一的包结构 plugin解析时统一处理*/
             messager.printMessage(Diagnostic.Kind.WARNING, "packageName:" + packageName);
@@ -142,7 +140,7 @@ public class ServiceProcessor extends AbstractProcessor {
         MethodSpec methodSpec = builder
                 .addStatement("return")
                 .build();
-        /*构建带有routerTable() 的类*/
+        /*构建带有insertInto() 方法的类*/
         TypeSpec clazz = TypeSpec.classBuilder(createdClassName)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ClassName.get(iRoutingTableType))

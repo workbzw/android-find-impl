@@ -89,7 +89,6 @@ class RoutingTableTransform extends Transform {
                 /************************************/
 
                 /***********************************/
-
                 File dest = outputProvider.getContentLocation(
                         directoryInput.getName(),
                         directoryInput.getContentTypes(),
