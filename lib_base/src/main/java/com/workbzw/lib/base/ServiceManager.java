@@ -61,8 +61,9 @@ public class ServiceManager {
 
     private static Class<? extends IService> getServiceImpl(String name) {
         Class<? extends IService> service = registry.get(name);
-        if (service == null)
+        if (service == null) {
             throw new IllegalArgumentException("can't find service with this name");
+        }
         return service;
     }
 
